@@ -17,6 +17,7 @@ class InputEmbeddings(nn.Module):
 
 class PositionalEncoding(nn.Module):
     def __init__(self, d_model: int, seq_len: int, dropout: int):
+        super().__init__()
         self.d_model = d_model
         self.seq_len = seq_len
         self.dropout = nn.Dropout(dropout)
@@ -119,10 +120,10 @@ class MultiHeadAttentionBlock(nn.Module):
         return self.w_o(x)
 
 class ResidualConnection(nn.Module):
-    def __init__(self, dropout: float):
+    def __init__(self, features: int, dropout: float):
         super().__init__()
         self.dropout = nn.Dropout(dropout)
-        self.norm = LayerNormalization()
+        self.norm = LayerNormalization(features)
 
     def forward(self, x, sublayer):
         return x + self.dropout(sublayer(self.norm(x)))
@@ -185,7 +186,7 @@ class LinearLayer(nn.Module):
 
     def forward(self, x):
         # (batch, seq_len, d_model) --> (batch, seq_len, vocab_size)
-        return torch.log_sofmax(self.linear(x), dim = -1)
+        return torch.log_softmax(self.linear(x), dim = -1)
 
 
 class Transformer(nn.Module):
